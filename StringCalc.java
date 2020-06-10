@@ -9,7 +9,7 @@ public class StringCalc{
     public static List<Integer> negativeNumber= new ArrayList<>();
     public static void main(final String[] args){
         
-        final int total= getInputString("//;\n1;2;3;4");
+        final int total= getInputString("//;\n1;1001;3;4000");
         System.out.println(total);
 
     }
@@ -27,7 +27,7 @@ public class StringCalc{
 
     public static int findSum(final List<String> extractIntegers) throws ArithmeticException{
       if(extractIntegers.size() > 0){
-        final int val= extractIntegers.stream().map(num->Integer.parseInt(num.trim())).reduce((total, order)-> add(total,order)).get();
+        final int val= extractIntegers.stream().map(num->Integer.parseInt(num.trim())).filter(num-> num<=1000).reduce((total, order)-> add(total,order)).get();
         if(negativeNumber != null && negativeNumber.size() > 0){
           throw new ArithmeticException("negatives not allowed " + negativeNumber.toString());
         }else{

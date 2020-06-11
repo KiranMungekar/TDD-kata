@@ -1,6 +1,10 @@
 import java.util.*; 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.lang.String;
+import java.lang.Character;
 
 public class StringCalc{
 
@@ -9,7 +13,7 @@ public class StringCalc{
     public static List<Integer> negativeNumber= new ArrayList<>();
     public static void main(final String[] args){
         
-        final int total= getInputString("//;\n1;1001;3;4000");
+        final int total= getInputString("//[***][%%]\n1001***2%%3");
         System.out.println(total);
 
     }
@@ -39,31 +43,64 @@ public class StringCalc{
     }
 
 
-    public static Map<String ,String> getDelimiter(final String inputString){
+    public static Map<String ,String> getDelimiter(String inputString){
      // JSONObject outputObj=new JSONObject();
       final Map<String ,String> outputs=new HashMap<>();
-      String defaultDelimiters=",\n";
+      String defaultDelimiters=",";
       String defaultString=inputString;
       if(inputString.startsWith("//")){
-        final String delimiter= inputString.substring(0, 4);
-        defaultDelimiters= defaultDelimiters.concat(delimiter);
-        final String transformedString= inputString.substring(4, inputString.length());
+        int firstOccN= inputString.indexOf("\n");
+        final String delimiter= inputString.substring(0, firstOccN);
+        defaultDelimiters= defaultDelimiters.concat(extractOnlyDelimiter(delimiter));
+        final String transformedString= inputString.substring(firstOccN+1, inputString.length());
         defaultString= transformedString;
       }
-      outputs.put("delimiter","["+defaultDelimiters+"]");
+      outputs.put("delimiter","["+defaultDelimiters+"]+");
       outputs.put("inputString", defaultString);
       return outputs;
     }
 
 
+    public static String extractOnlyDelimiter(String delimiterString){
+        String delimiters ="";
+      if(delimiterString.contains("[")){
+        Pattern p = Pattern.compile("\\[(.*?)\\]");
+        Matcher m = p.matcher(delimiterString);
+        while(m.find()) {
+          String escapesChars="";
+          System.out.println(m.group(1).toCharArray());
+          List<char[]>ch1=Arrays.asList(m.group(1).toCharArray());
+          for (int i = 0;i < m.group(1).length(); i++){
+            escapesChars+="\\\\"+m.group(1).charAt(i);
+          }
+         
+          // 
+          // dlList.forEach(action->{
+          //   escapesChars+="\\"+action;
+          // });
+          
+          //dlList.stream().map(eachChar->);
+
+          System.out.println("escaped "+escapesChars);
+          delimiters= delimiters.concat("|"+"["+escapesChars+"]");
+        }
+      
+      }
+      return delimiters;
+    }
+    //[,|\\*\\*\\*]+
+
     //simple String calculator with a method signature:
     public static int getInputString(final String numbers){
       if(numbers.length() > 0){
+         //patternMatching(numbers);
         final Map<String,String> inputs=getDelimiter(numbers);
         System.out.println(inputs);
+      //  Pattern p = Pattern.compile("\\[(.*?)\\]");
+        String pattern= inputs.get("delimiter");
+        final List<String> extractIntegers= Arrays.asList(inputs.get("inputString").split(pattern));
 
-        final List<String> extractIntegers= Arrays.asList(inputs.get("inputString").split(inputs.get("delimiter")));
-      //   System.out.println(extractIntegers);
+        System.out.println("Before sum "+ extractIntegers);
         final int total= findSum(extractIntegers);
         return total;
       }
